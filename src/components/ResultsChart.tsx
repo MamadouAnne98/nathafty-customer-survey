@@ -154,7 +154,7 @@ export default function ResultsChart({ data }: ResultsChartProps) {
             <p className="text-xs text-gray-600 mb-1">👤 Contact</p>
             <p className="text-sm font-semibold text-gray-700">{data.name}</p>
             <p className="text-xs text-gray-600">📞 {data.phone}</p>
-            <p className="text-xs text-gray-600">💬 {data.whatsapp}</p>
+            {data.whatsapp && <p className="text-xs text-gray-600">💬 {data.whatsapp}</p>}
           </div>
         </div>
       </div>

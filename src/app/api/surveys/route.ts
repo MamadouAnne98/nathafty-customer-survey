@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSurvey, checkDuplicatePhone, getAllSurveys } from '@/services/surveyService';
 
+export const dynamic = 'force-dynamic';
+
 // Types pour la validation
 interface SurveyRequestBody {
   name: string;

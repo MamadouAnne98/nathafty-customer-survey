@@ -28,6 +28,11 @@ export async function createSurvey(
   ipAddress?: string,
   userAgent?: string
 ): Promise<number> {
+  if (!supabaseAdmin) {
+    console.warn('⚠️ Supabase non configuré');
+    return 0;
+  }
+  
   try {
     const surveyData = {
       ...data,
@@ -57,6 +62,11 @@ export async function createSurvey(
  * Récupérer toutes les enquêtes
  */
 export async function getAllSurveys(limit = 100, offset = 0): Promise<SurveyRecord[]> {
+  if (!supabaseAdmin) {
+    console.warn('⚠️ Supabase non configuré');
+    return [];
+  }
+
   try {
     const { data, error } = await supabaseAdmin
       .from('household_surveys')
@@ -80,6 +90,11 @@ export async function getAllSurveys(limit = 100, offset = 0): Promise<SurveyReco
  * Récupérer une enquête par ID
  */
 export async function getSurveyById(id: number): Promise<SurveyRecord | null> {
+  if (!supabaseAdmin) {
+    console.warn('⚠️ Supabase non configuré');
+    return null;
+  }
+
   try {
     const { data, error } = await supabaseAdmin
       .from('household_surveys')
@@ -106,6 +121,11 @@ export async function getSurveyById(id: number): Promise<SurveyRecord | null> {
  * Vérifier si un téléphone existe déjà (détecter les doublons)
  */
 export async function checkDuplicatePhone(phone: string): Promise<boolean> {
+  if (!supabaseAdmin) {
+    console.warn('⚠️ Supabase non configuré');
+    return false;
+  }
+
   try {
     const { data, error } = await supabaseAdmin
       .from('household_surveys')
@@ -129,6 +149,17 @@ export async function checkDuplicatePhone(phone: string): Promise<boolean> {
  * Obtenir les statistiques globales
  */
 export async function getStatistics() {
+  if (!supabaseAdmin) {
+    console.warn('⚠️ Supabase non configuré');
+    return {
+      total_surveys: 0,
+      unique_households: 0,
+      avg_bags_per_week: 0,
+      paying_customers: 0,
+      paying_percentage: 0
+    };
+  }
+
   try {
     // Compter le total d'enquêtes
     const { count: totalSurveys, error: countError } = await supabaseAdmin
@@ -161,7 +192,7 @@ export async function getStatistics() {
     const { count: payingCount, error: payingError } = await supabaseAdmin
       .from('household_surveys')
       .select('*', { count: 'exact', head: true })
-      .eq('pays_service', 'Oui');
+      .eq('pays_service', true);
 
     if (payingError) throw payingError;
 
@@ -178,25 +209,4 @@ export async function getStatistics() {
   }
 }
 
-/**
- * Tester la connexion à Supabase
- */
-export async function testConnection(): Promise<boolean> {
-  try {
-    const { error } = await supabaseAdmin
-      .from('household_surveys')
-      .select('id')
-      .limit(1);
 
-    if (error) {
-      console.error('❌ Erreur de connexion Supabase:', error);
-      return false;
-    }
-
-    console.log('✅ Connexion à Supabase réussie');
-    return true;
-  } catch (error) {
-    console.error('❌ Erreur de connexion Supabase:', error);
-    return false;
-  }
-}
